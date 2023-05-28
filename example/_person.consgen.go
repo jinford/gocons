@@ -4,7 +4,6 @@ package example
 
 import (
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -17,7 +16,6 @@ func NewPerson(
 	desc sql.NullString,
 	createdAt *time.Time,
 	deposit *deposit,
-	stringer *fmt.Stringer,
 ) *Person {
 	return &Person{
 		id:        id,
@@ -26,7 +24,6 @@ func NewPerson(
 		desc:      desc,
 		createdAt: createdAt,
 		deposit:   deposit,
-		Stringer:  stringer,
 	}
 }
 
