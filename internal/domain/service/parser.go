@@ -3,11 +3,11 @@ package service
 import (
 	"fmt"
 	"go/ast"
-	"go/importer"
 	"go/parser"
 	"go/token"
 	"go/types"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/jinford/gocons/internal/domain/entity"
@@ -47,20 +47,7 @@ func (a *astParser) SrcPkgName() string {
 }
 
 func (a *astParser) ParseSturcts() ([]*entity.Struct, error) {
-	config := &types.Config{
-		Importer: importer.Default(),
-	}
-
-	info := &types.Info{
-		Defs: make(map[*ast.Ident]types.Object),
-	}
-
 	pkgName := a.astFile.Name.Name
-	pkg, err := config.Check(pkgName, a.tokenFileset, []*ast.File{a.astFile}, info)
-	if err != nil {
-		return nil, fmt.Errorf("type-checks error: %w", err)
-	}
-
 	structs := []*entity.Struct{}
 	ast.Inspect(a.astFile, func(node ast.Node) bool {
 		t, ok := node.(*ast.TypeSpec)
@@ -68,11 +55,12 @@ func (a *astParser) ParseSturcts() ([]*entity.Struct, error) {
 			return true
 		}
 
-		structName := t.Name.Name
-		s, ok := pkg.Scope().Lookup(structName).Type().Underlying().(*types.Struct)
+		s, ok := t.Type.(*ast.StructType)
 		if !ok {
 			return true
 		}
+
+		structName := t.Name.Name
 
 		fileds := a.parseFields(pkgName, s)
 		structs = append(structs, entity.NewStruct(structName, fileds))
@@ -83,25 +71,42 @@ func (a *astParser) ParseSturcts() ([]*entity.Struct, error) {
 	return structs, nil
 }
 
-func (a *astParser) parseFields(pkgName string, s *types.Struct) []*entity.Field {
-	fs := make([]*entity.Field, s.NumFields())
-	for i := 0; i < s.NumFields(); i++ {
-		field := s.Field(i)
+func (a *astParser) parseFields(pkgName string, s *ast.StructType) []*entity.Field {
+	fs := make([]*entity.Field, len(s.Fields.List))
+	for i, field := range s.Fields.List {
+		fieldType := types.ExprString(field.Type)
 
-		typePkg, typeName, found := strings.Cut(field.Type().String(), ".")
+		typePkg, typeName, found := strings.Cut(fieldType, ".")
 		if !found {
 			typePkg = ""
-			typeName = field.Type().String()
+			typeName = fieldType
 		}
 
 		if typePkg == a.SrcPkgName() {
 			typePkg = ""
 		}
 
-		tagRawValue := reflect.StructTag(s.Tag(i)).Get(a.structTag)
-		tagValues := strings.Split(tagRawValue, ",")
+		var fieldName string
+		if len(field.Names) > 0 {
+			fieldName = field.Names[0].Name
+		} else {
+			// embedding field
+			// trim "*" as it could be a pointer
+			fieldName = strings.TrimPrefix(typeName, "*")
+		}
 
-		fs[i] = entity.NewField(field.Name(), typePkg, typeName, field.Exported(), tagValues)
+		tagValues := []string{}
+		if field.Tag != nil {
+			tag, err := strconv.Unquote(field.Tag.Value)
+			if err != nil {
+				panic(err)
+			}
+
+			tagRawValue := reflect.StructTag(tag).Get(a.structTag)
+			tagValues = strings.Split(tagRawValue, ",")
+		}
+
+		fs[i] = entity.NewField(fieldName, typePkg, typeName, ast.IsExported(fieldName), tagValues)
 	}
 
 	return fs
