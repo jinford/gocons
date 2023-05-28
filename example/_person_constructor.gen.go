@@ -4,6 +4,8 @@ package example
 
 import (
 	"database/sql"
+	"fmt"
+	"time"
 
 	"github.com/shopspring/decimal"
 )
@@ -13,14 +15,18 @@ func NewPerson(
 	name string,
 	tags []string,
 	desc sql.NullString,
+	createdAt *time.Time,
 	deposit *deposit,
+	stringer *fmt.Stringer,
 ) *Person {
 	return &Person{
-		id:      id,
-		name:    name,
-		tags:    tags,
-		desc:    desc,
-		deposit: deposit,
+		id:        id,
+		name:      name,
+		tags:      tags,
+		desc:      desc,
+		createdAt: createdAt,
+		deposit:   deposit,
+		Stringer:  stringer,
 	}
 }
 
@@ -40,18 +46,22 @@ func (x *Person) Desc() sql.NullString {
 	return x.desc
 }
 
+func (x *Person) CreatedAt() *time.Time {
+	return x.createdAt
+}
+
 func (x *Person) Deposit() *deposit {
 	return x.deposit
 }
 
 func NewDeposit(
-	charge decimal.Decimal,
+	charge []decimal.Decimal,
 ) *deposit {
 	return &deposit{
 		charge: charge,
 	}
 }
 
-func (x *deposit) Charge() decimal.Decimal {
+func (x *deposit) Charge() []decimal.Decimal {
 	return x.charge
 }
