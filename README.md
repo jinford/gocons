@@ -31,7 +31,7 @@ GLOBAL OPTIONS:
 Prepare a struct definition file with `go:generate`. It can generate a getter method for a private field by using `cons:"getter"` tag. If the field is exported, the getter method will be not generated. Also, the tag's key can be changed by option.
 
 ```go
-//go:generate --src=$GOFILE
+//go:generate gocons --src=$GOFILE
 type Person struct {
     id       string         `cons:"getter"`
     name     string         `cons:"getter"`
