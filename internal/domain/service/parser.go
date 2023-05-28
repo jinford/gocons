@@ -76,21 +76,16 @@ func (a *astParser) parseFields(pkgName string, s *ast.StructType) []*entity.Fie
 	for i, field := range s.Fields.List {
 		fieldType := types.ExprString(field.Type)
 
-		typePkg, typeName, found := strings.Cut(fieldType, ".")
-		if !found {
-			typePkg = ""
-			typeName = fieldType
-		}
-
-		if typePkg == a.SrcPkgName() {
-			typePkg = ""
-		}
-
 		var fieldName string
 		if len(field.Names) > 0 {
 			fieldName = field.Names[0].Name
 		} else {
 			// embedding field
+			_, typeName, found := strings.Cut(fieldType, ".")
+			if !found {
+				typeName = fieldType
+			}
+
 			// trim "*" as it could be a pointer
 			fieldName = strings.TrimPrefix(typeName, "*")
 		}
@@ -106,7 +101,7 @@ func (a *astParser) parseFields(pkgName string, s *ast.StructType) []*entity.Fie
 			tagValues = strings.Split(tagRawValue, ",")
 		}
 
-		fs[i] = entity.NewField(fieldName, typePkg, typeName, ast.IsExported(fieldName), tagValues)
+		fs[i] = entity.NewField(fieldName, fieldType, ast.IsExported(fieldName), tagValues)
 	}
 
 	return fs

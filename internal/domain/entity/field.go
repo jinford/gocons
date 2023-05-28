@@ -10,16 +10,14 @@ import (
 
 type Field struct {
 	name      string
-	typePkg   string
 	typeName  string
 	exported  bool
 	tagValues []string
 }
 
-func NewField(name string, typePkg string, typeName string, exported bool, tagValues []string) *Field {
+func NewField(name string, typeName string, exported bool, tagValues []string) *Field {
 	return &Field{
 		name:      name,
-		typePkg:   typePkg,
 		typeName:  typeName,
 		exported:  exported,
 		tagValues: tagValues,

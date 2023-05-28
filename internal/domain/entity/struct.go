@@ -46,7 +46,7 @@ func (s *Struct) GenerateConstructorStatement() string {
 		},
 		func(g *jen.Group) {
 			for _, field := range s.fields {
-				g.Id(field.LowerName()).Qual(field.typePkg, field.typeName)
+				g.Id(field.LowerName()).Id(field.typeName)
 			}
 		}).Op("*").Id(s.name).Block(
 		jen.Return(jen.Op("&").Id(s.name).CustomFunc(
@@ -82,7 +82,7 @@ func (s *Struct) GenerateGettersStatement() []string {
 
 		stmt := jen.Func().Params(
 			jen.Id("x").Op("*").Id(s.name),
-		).Id(f.UpperName()).Params().Qual(f.typePkg, f.typeName).Block(
+		).Id(f.UpperName()).Params().Id(f.typeName).Block(
 			jen.Return(jen.Id("x").Dot(f.name)),
 		)
 
