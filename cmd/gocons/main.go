@@ -73,7 +73,7 @@ func execute(cCtx *cli.Context) error {
 	case "file":
 		ext := filepath.Ext(src)
 		before, _ := strings.CutSuffix(src, ext)
-		dest := fmt.Sprintf("%s_constructor.gen%s", before, ext)
+		dest := fmt.Sprintf("%s.consgen%s", before, ext)
 		printer = repository.NewFilePrinter(dest)
 	case "stdout":
 		printer = repository.NewStdoutPrinter()
