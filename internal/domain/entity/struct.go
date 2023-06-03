@@ -34,8 +34,15 @@ func NewStruct(name string, fields []*Field) *Struct {
 		}
 	}
 */
-func (s *Struct) GenerateConstructorStatement() string {
+func (s *Struct) GenerateConstructorStatement(needReturnValueType bool) string {
 	funcName := fmt.Sprintf("New%s", s.UpperName())
+
+	opAsterisk := "*"
+	opAnd := "&"
+	if needReturnValueType {
+		opAsterisk = ""
+		opAnd = ""
+	}
 
 	stmt := jen.Func().Id(funcName).CustomFunc(
 		jen.Options{
@@ -48,8 +55,9 @@ func (s *Struct) GenerateConstructorStatement() string {
 			for _, field := range s.fields {
 				g.Id(field.LowerName()).Id(field.typeName)
 			}
-		}).Op("*").Id(s.name).Block(
-		jen.Return(jen.Op("&").Id(s.name).CustomFunc(
+		},
+	).Op(opAsterisk).Id(s.name).Block(
+		jen.Return(jen.Op(opAnd).Id(s.name).CustomFunc(
 			jen.Options{
 				Close:     "}",
 				Multi:     true,
