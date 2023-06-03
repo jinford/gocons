@@ -34,7 +34,7 @@ func main() {
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     flagNameSrc,
-				Usage:    "path of file that declares structs",
+				Usage:    "path of file that declares structs (required)",
 				Required: true,
 			},
 			&cli.StringFlag{

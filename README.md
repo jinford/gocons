@@ -18,12 +18,12 @@ COMMANDS:
    help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --src value     path of file that declares structs
+   --src value     path of file that declares structs (required)
    --tag value     name of target struct tag (default: "cons")
    --output value  output: 'file', 'stdout' (default: "file")
+   --values        generate constructor returning the value struct, instead of the pointer one (default: false)
    --help, -h      show help
    --version, -v   print the version
-
 ```
 
 ## Synopsis
@@ -76,3 +76,24 @@ func (x *Person) Name() string {
 
 ```
 
+If you want generate a constructor returning the values struct instead of pointers one, set the '--values' flag.
+
+
+```go
+func NewPerson(
+	id string,
+	name string,
+	tags []string,
+	desc sql.NullString,
+	deposit *deposit,
+) Person {
+	return Person{
+		id:      id,
+		name:    name,
+		tags:    tags,
+		desc:    desc,
+		deposit: deposit,
+	}
+}
+
+```
