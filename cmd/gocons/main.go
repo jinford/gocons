@@ -23,6 +23,7 @@ const (
 	flagNameSrc    = "src"
 	flagNameTag    = "tag"
 	flagNameOutput = "output"
+	flagNameValues = "values"
 )
 
 func main() {
@@ -46,6 +47,10 @@ func main() {
 				Usage: "output: 'file', 'stdout'",
 				Value: "file",
 			},
+			&cli.BoolFlag{
+				Name:  flagNameValues,
+				Usage: "generate constructor returning the value struct, instead of the pointer one",
+			},
 		},
 		Action: execute,
 	}
@@ -60,13 +65,14 @@ func execute(cCtx *cli.Context) error {
 	src := cCtx.String(flagNameSrc)
 	tag := cCtx.String(flagNameTag)
 	output := cCtx.String(flagNameOutput)
+	needReturnValueType := cCtx.Bool(flagNameValues)
 
 	parser, err := service.NewParser(src, tag)
 	if err != nil {
 		return err
 	}
 
-	generater := service.NewCodeGenerator(appName)
+	generater := service.NewCodeGenerator(appName, needReturnValueType)
 
 	var printer repository.Printer
 	switch output {
