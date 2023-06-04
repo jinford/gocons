@@ -65,14 +65,14 @@ func execute(cCtx *cli.Context) error {
 	src := cCtx.String(flagNameSrc)
 	tag := cCtx.String(flagNameTag)
 	output := cCtx.String(flagNameOutput)
-	needReturnValueType := cCtx.Bool(flagNameValues)
+	isValues := cCtx.Bool(flagNameValues)
 
 	parser, err := service.NewParser(src, tag)
 	if err != nil {
 		return err
 	}
 
-	generater := service.NewCodeGenerator(appName, needReturnValueType)
+	generater := service.NewCodeGenerator(appName, isValues)
 
 	var printer repository.Printer
 	switch output {

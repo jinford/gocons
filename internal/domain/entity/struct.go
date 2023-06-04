@@ -34,12 +34,12 @@ func NewStruct(name string, fields []*Field) *Struct {
 		}
 	}
 */
-func (s *Struct) GenerateConstructorStatement(needReturnValueType bool) string {
+func (s *Struct) GenerateConstructorStatement(isValues bool) string {
 	funcName := fmt.Sprintf("New%s", s.UpperName())
 
 	opAsterisk := "*"
 	opAnd := "&"
-	if needReturnValueType {
+	if isValues {
 		opAsterisk = ""
 		opAnd = ""
 	}
@@ -80,8 +80,13 @@ func (s *Struct) GenerateConstructorStatement(needReturnValueType bool) string {
 		return x.<f.Name>
 	}
 */
-func (s *Struct) GenerateGettersStatement() []string {
+func (s *Struct) GenerateGettersStatement(isValues bool) []string {
 	stmts := []string{}
+
+	opAsterisk := "*"
+	if isValues {
+		opAsterisk = ""
+	}
 
 	for _, f := range s.fields {
 		if !f.NeedsGetter() {
@@ -89,7 +94,7 @@ func (s *Struct) GenerateGettersStatement() []string {
 		}
 
 		stmt := jen.Func().Params(
-			jen.Id("x").Op("*").Id(s.name),
+			jen.Id("x").Op(opAsterisk).Id(s.name),
 		).Id(f.UpperName()).Params().Id(f.typeName).Block(
 			jen.Return(jen.Id("x").Dot(f.name)),
 		)
