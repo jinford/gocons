@@ -25,10 +25,14 @@ func NewField(name string, typeName string, exported bool, tagValues []string) *
 }
 
 // Getterメソッドを生成する必要があるか判定する。
-// フィールドがプライベートのとき、かつconsタグに"getter"が含まれているときの生成する必要がある。
-func (f *Field) NeedsGetter() bool {
+// フィールドがプライベートのとき、かつconsタグに"getter"が含まれているときもしくは all-getter が有効のとき生成する必要がある。
+func (f *Field) NeedsGetter(allGetter bool) bool {
 	if f.exported {
 		return false
+	}
+
+	if allGetter {
+		return true
 	}
 
 	for _, v := range f.tagValues {
