@@ -2,6 +2,12 @@
 
 gocons is a cli tool that generate constructor function & getter methods for structs
 
+## Installation
+
+```bash
+$ go install github.com/jinford/gocons/cmd/gocons@latest
+```
+
 ## Usage
 
 ```bash
@@ -22,6 +28,7 @@ GLOBAL OPTIONS:
    --tag value     name of target struct tag (default: "cons")
    --output value  output: 'file', 'stdout' (default: "file")
    --values        generate constructor returning the value struct, instead of the pointer one (default: false)
+   --all-getter    generate all getter methods for a private field even without struct tag (default: false)
    --help, -h      show help
    --version, -v   print the version
 ```
@@ -31,7 +38,7 @@ GLOBAL OPTIONS:
 Prepare a struct definition file with `go:generate`. It can generate a getter method for a private field by using `cons:"getter"` tag. If the field is exported, the getter method will be not generated. Also, the tag's key can be changed by option.
 
 ```go
-//go:generate gocons --src=$GOFILE
+//go:generate github.com/jinford/gocons/cmd/gocons@latest --src=$GOFILE
 type Person struct {
     id       string         `cons:"getter"`
     name     string         `cons:"getter"`
@@ -77,7 +84,6 @@ func (x *Person) Name() string {
 ```
 
 If you want generate a constructor returning the values struct instead of pointers one, set the '--values' flag.
-
 
 ```go
 func NewPerson(
