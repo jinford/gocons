@@ -20,10 +20,11 @@ var (
 const (
 	appName = "gocons"
 
-	flagNameSrc    = "src"
-	flagNameTag    = "tag"
-	flagNameOutput = "output"
-	flagNameValues = "values"
+	flagNameSrc       = "src"
+	flagNameTag       = "tag"
+	flagNameOutput    = "output"
+	flagNameValues    = "values"
+	flagNameAllGetter = "all-getter"
 )
 
 func main() {
@@ -51,6 +52,10 @@ func main() {
 				Name:  flagNameValues,
 				Usage: "generate constructor returning the value struct, instead of the pointer one",
 			},
+			&cli.BoolFlag{
+				Name:  flagNameAllGetter,
+				Usage: `generate all getter methods for a private field even without struct tag`,
+			},
 		},
 		Action: execute,
 	}
@@ -66,13 +71,14 @@ func execute(cCtx *cli.Context) error {
 	tag := cCtx.String(flagNameTag)
 	output := cCtx.String(flagNameOutput)
 	isValues := cCtx.Bool(flagNameValues)
+	allGetter := cCtx.Bool(flagNameAllGetter)
 
 	parser, err := service.NewParser(src, tag)
 	if err != nil {
 		return err
 	}
 
-	generater := service.NewCodeGenerator(appName, isValues)
+	generater := service.NewCodeGenerator(appName, isValues, allGetter)
 
 	var printer repository.Printer
 	switch output {

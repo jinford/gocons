@@ -80,7 +80,7 @@ func (s *Struct) GenerateConstructorStatement(isValues bool) string {
 		return x.<f.Name>
 	}
 */
-func (s *Struct) GenerateGettersStatement(isValues bool) []string {
+func (s *Struct) GenerateGettersStatement(isValues bool, allGetter bool) []string {
 	stmts := []string{}
 
 	opAsterisk := "*"
@@ -89,7 +89,7 @@ func (s *Struct) GenerateGettersStatement(isValues bool) []string {
 	}
 
 	for _, f := range s.fields {
-		if !f.NeedsGetter() {
+		if !f.NeedsGetter(allGetter) {
 			continue
 		}
 

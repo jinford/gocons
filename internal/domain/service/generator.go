@@ -13,14 +13,16 @@ type CodeGenerater interface {
 }
 
 type codeGenerater struct {
-	appName  string
-	isValues bool
+	appName   string
+	isValues  bool
+	allGetter bool
 }
 
-func NewCodeGenerator(appName string, isValues bool) CodeGenerater {
+func NewCodeGenerator(appName string, isValues bool, allGetter bool) CodeGenerater {
 	return &codeGenerater{
-		appName:  appName,
-		isValues: isValues,
+		appName:   appName,
+		isValues:  isValues,
+		allGetter: allGetter,
 	}
 }
 
@@ -30,7 +32,7 @@ func (g *codeGenerater) GenerateCode(pkgName string, structs []*entity.Struct) (
 
 	for _, s := range structs {
 		f.Add(jen.Id(s.GenerateConstructorStatement(g.isValues)).Line())
-		for _, getter := range s.GenerateGettersStatement(g.isValues) {
+		for _, getter := range s.GenerateGettersStatement(g.isValues, g.allGetter) {
 			f.Add(jen.Id(getter).Line())
 		}
 
